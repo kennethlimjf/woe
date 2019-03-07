@@ -4,7 +4,7 @@ import pandas as pd
 
 class config:
 
-    def __init__(self):
+    def __init__(self, min_sample_weight=0.05):
         self.config = None
         self.dataset_train = None
         self.variable_type = None
@@ -15,6 +15,7 @@ class config:
         self.min_sample = None
         self.global_bt = None
         self.global_gt = None
+        self.min_sample_weight = min_sample_weight
 
     def load_file(self,config_path,data_path=False):
         self.config = pd.read_csv(config_path)
@@ -40,7 +41,7 @@ class config:
 
             # specify some other global variables about the training dataset
             self.dataset_len = len(self.dataset_train)
-            self.min_sample = int(self.dataset_len * 0.05)
+            self.min_sample = int(self.dataset_len * self.min_sample_weight)
             self.global_bt = sum(self.dataset_train['target'])
             self.global_gt = len(self.dataset_train) - sum(self.dataset_train['target'])
 

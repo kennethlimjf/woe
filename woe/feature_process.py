@@ -496,10 +496,10 @@ def fillna(dataset,bin_var_list,discrete_var_list,continuous_filler=-1,discrete_
         dataset.loc[dataset[var].isnull(), (var)] = discrete_filler
 
 
-def process_train_woe(infile_path=None,outfile_path=None,rst_path=None,config_path=None):
+def process_train_woe(infile_path=None,outfile_path=None,rst_path=None,config_path=None,min_sample_weight=0.05):
     print('run into process_train_woe: \n',time.asctime(time.localtime(time.time())))
     data_path = infile_path
-    cfg = config.config()
+    cfg = config.config(min_sample_weight=min_sample_weight)
     cfg.load_file(config_path,data_path)
     bin_var_list = [tmp for tmp in cfg.bin_var_list if tmp in list(cfg.dataset_train.columns)]
 
@@ -558,4 +558,4 @@ def process_woe_trans(in_data_path=None,rst_path=None,out_path=None,config_path=
     for r in rst:
         cfg.dataset_train[r.var_name] = woe_trans(cfg.dataset_train[r.var_name], r)
 
-    cfg.dataset_train.to_csv(out_path)
+    cfg.dataset_train.to_csv(out_path, index=False)
