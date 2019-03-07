@@ -1,10 +1,12 @@
-Metadata-Version: 1.1
+Metadata-Version: 1.2
 Name: woe
-Version: 0.1.4
+Version: 0.1.5
 Summary: Tools for WoE Transformation mostly used in ScoreCard Model for credit rating
 Home-page: https://github.com/boredbird/woe
 Author: boredbird
 Author-email: 1002937942@qq.com
+Maintainer: boredbird
+Maintainer-email: 1002937942@qq.com
 License: MIT
 Description: woe
         ===

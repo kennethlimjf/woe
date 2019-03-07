@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'woe',
-    version = '0.1.4',
+    version = '0.1.5',
     description = (
         'Tools for WoE Transformation mostly used in ScoreCard Model for credit rating'
     ),
