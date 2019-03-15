@@ -157,8 +157,8 @@ def calulate_iv(df,var,global_bt,global_gt):
     gt_sub = df.shape[0] - bt_sub
     gri = (gt_sub + 0.0001)* 1.0 / global_gt
 
-    groupdetail['woei'] = np.log(bri / gri)
-    groupdetail['ivi'] = (bri - gri) * np.log(bri / gri)
+    groupdetail['woei'] = np.log(gri / bri)
+    groupdetail['ivi'] = (gri - bri) * np.log(gri / bri)
     groupdetail['sub_total_num_percentage'] = df.shape[0]*1.0/(global_bt+global_gt)
     groupdetail['positive_sample_num'] = bt_sub
     groupdetail['negative_sample_num'] = gt_sub
@@ -190,12 +190,12 @@ def calculate_iv_split(df,var,split_point,global_bt,global_gt):
 
     lbr = (l1_cnt+ 0.0001)*1.0/global_bt
     lgr = (l0_cnt+ 0.0001)*1.0/global_gt
-    woel = np.log(lbr/lgr)
-    ivl = (lbr-lgr)*woel
+    woel = np.log(lgr/lbr)
+    ivl = (lgr-lbr)*woel
     rbr = (r1_cnt+ 0.0001)*1.0/global_bt
     rgr = (r0_cnt+ 0.0001)*1.0/global_gt
-    woer = np.log(rbr/rgr)
-    ivr = (rbr-rgr)*woer
+    woer = np.log(rgr/rbr)
+    ivr = (rgr-rbr)*woer
     iv = ivl+ivr
 
     return woel,woer,iv,dataset_l,dataset_r,ivl,ivr
