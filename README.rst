@@ -4,7 +4,7 @@ woe
 .. image:: https://travis-ci.org/justdoit0823/pywxclient.svg?branch=master
     :target: https://travis-ci.org/justdoit0823/pywxclient
 
-version: 0.1.4
+version: 0.1.6
 
 Tools for WoE Transformation mostly used in ScoreCard Model for credit rating
 
