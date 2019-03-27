@@ -1,6 +1,6 @@
 Metadata-Version: 1.2
 Name: woe
-Version: 0.1.6
+Version: 0.1.7
 Summary: Tools for WoE Transformation mostly used in ScoreCard Model for credit rating
 Home-page: https://github.com/boredbird/woe
 Author: boredbird
@@ -14,7 +14,7 @@ Description: woe
         .. image:: https://travis-ci.org/justdoit0823/pywxclient.svg?branch=master
             :target: https://travis-ci.org/justdoit0823/pywxclient
         
-        version: 0.1.6
+        version: 0.1.7
         
         Tools for WoE Transformation mostly used in ScoreCard Model for credit rating
         

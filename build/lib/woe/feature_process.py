@@ -496,66 +496,117 @@ def fillna(dataset,bin_var_list,discrete_var_list,continuous_filler=-1,discrete_
         dataset.loc[dataset[var].isnull(), (var)] = discrete_filler
 
 
-def process_train_woe(infile_path=None,outfile_path=None,rst_path=None,config_path=None,min_sample_weight=0.05):
-    print('run into process_train_woe: \n',time.asctime(time.localtime(time.time())))
-    data_path = infile_path
-    cfg = config.config(min_sample_weight=min_sample_weight)
-    cfg.load_file(config_path,data_path)
-    bin_var_list = [tmp for tmp in cfg.bin_var_list if tmp in list(cfg.dataset_train.columns)]
+def process_train_woe(
+        dataset,
+        outfile_path=None,
+        rst_path=None,
+        config_path=None,
+        min_sample_weight=0.05):
+    ''' Process training data for WOE
 
+    Parameters
+    ----------
+    dataset : Pandas dataframe of training dataset. Includes 'target' column.
+    outfile_path : Path for WOE feature details output.
+    rst_path : Path for WOE InfoValue object output.
+    config_path : Path to read config file from.
+    min_sample_weight : Adjust the percentage of samples required for leaf.
+
+    Return
+    ------
+    feature_detail : WOE feature details
+    rst : List of InfoValue instances
+    '''
+    # Load config
+    cfg = config.config(min_sample_weight=min_sample_weight)
+    cfg.load_file(config_path)
+    cfg.set_dataset(dataset)
+
+    # Prepare variable list
+    bin_var_list = [tmp for tmp in cfg.bin_var_list
+                        if tmp in list(cfg.dataset_train.columns)]
+
+    discrete_var_list = [tmp for tmp in cfg.discrete_var_list
+                             if tmp in list(cfg.dataset_train.columns)]
+
+    # Impute missing values for features to be binned
     for var in bin_var_list:
-        # fill null
         cfg.dataset_train.loc[cfg.dataset_train[var].isnull(), (var)] = -1
 
-    # change feature dtypes
+    # Cast feature dtypes
     change_feature_dtype(cfg.dataset_train, cfg.variable_type)
+
+    # Process woe transformation of continuous variables
     rst = []
-
-    # process woe transformation of continuous variables
-    print('process woe transformation of continuous variables: \n',time.asctime(time.localtime(time.time())))
-    print('cfg.global_bt',cfg.global_bt)
-    print('cfg.global_gt', cfg.global_gt)
-
     for var in bin_var_list:
-        rst.append(proc_woe_continuous(cfg.dataset_train,var,cfg.global_bt,cfg.global_gt,cfg.min_sample,alpha=0.05))
+        iv_obj = proc_woe_continuous(
+                     cfg.dataset_train, var,
+                     cfg.global_bt, cfg.global_gt, cfg.min_sample,
+                     alpha=0.05)
+        rst.append(iv_obj)
 
-    # process woe transformation of discrete variables
-    print('process woe transformation of discrete variables: \n',time.asctime(time.localtime(time.time())))
-    for var in [tmp for tmp in cfg.discrete_var_list if tmp in list(cfg.dataset_train.columns)]:
-        # fill null
+    # Process woe transformation of discrete variables
+    for var in discrete_var_list:
         cfg.dataset_train.loc[cfg.dataset_train[var].isnull(), (var)] = 'missing'
-        rst.append(proc_woe_discrete(cfg.dataset_train,var,cfg.global_bt,cfg.global_gt,cfg.min_sample,alpha=0.05))
+        iv_obj = proc_woe_discrete(
+                     cfg.dataset_train, var,
+                     cfg.global_bt, cfg.global_gt, cfg.min_sample,
+                     alpha=0.05)
+        rst.append(iv_obj)
 
     feature_detail = eval.eval_feature_detail(rst, outfile_path)
 
-    print('save woe transformation rule into pickle: \n',time.asctime(time.localtime(time.time())))
-    output = open(rst_path, 'wb')
-    pickle.dump(rst,output)
-    output.close()
+    # Write list of InfoValue instances to output path
+    with open(rst_path, 'wb') as f:
+        pickle.dump(rst, f)
 
-    return feature_detail,rst
+    return feature_detail, rst
 
 
-def process_woe_trans(in_data_path=None,rst_path=None,out_path=None,config_path=None):
+def process_woe_trans(
+        dataset,
+        rst_path=None,
+        config_path=None):
+    ''' Process WOE features from fitted InfoValues
+
+    Parameters
+    ----------
+    dataset : Pandas dataframe to be processed
+    rst_path : Path to list of InfoValue pickle object
+    config_path : Path to read config file from.
+
+    Return
+    ------
+    dataset_transformed : Pandas dataframe that is transformed
+    '''
+    # Load config
     cfg = config.config()
-    cfg.load_file(config_path, in_data_path)
+    cfg.load_file(config_path)
+    cfg.set_dataset(dataset)
 
-    for var in [tmp for tmp in cfg.bin_var_list if tmp in list(cfg.dataset_train.columns)]:
-        # fill null
+    # Prepare variable list
+    bin_var_list = [tmp for tmp in cfg.bin_var_list
+                        if tmp in list(cfg.dataset_train.columns)]
+    discrete_var_list = [tmp for tmp in cfg.discrete_var_list
+                             if tmp in list(cfg.dataset_train.columns)]
+
+    # Impute missing values
+    for var in bin_var_list:
         cfg.dataset_train.loc[cfg.dataset_train[var].isnull(), (var)] = -1
 
-    for var in [tmp for tmp in cfg.discrete_var_list if tmp in list(cfg.dataset_train.columns)]:
-        # fill null
+    for var in discrete_var_list:
         cfg.dataset_train.loc[cfg.dataset_train[var].isnull(), (var)] = 'missing'
 
+    # Cast dataframe dtypes
     change_feature_dtype(cfg.dataset_train, cfg.variable_type)
 
-    output = open(rst_path, 'rb')
-    rst = pickle.load(output)
-    output.close()
+    # Load fitted InfoValues
+    with open(rst_path, 'rb') as f:
+        rst = pickle.load(f)
 
     # Training dataset Woe Transformation
     for r in rst:
         cfg.dataset_train[r.var_name] = woe_trans(cfg.dataset_train[r.var_name], r)
 
-    cfg.dataset_train.to_csv(out_path, index=False)
+    return cfg.dataset_train.copy()
+
