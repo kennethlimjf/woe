@@ -5,10 +5,7 @@ import subprocess
 import woe.feature_process as fp
 
 
-FIT_DATA_PATH = 'woe_processing/fit_data.csv'
-TRANSFORM_DATA_PATH = 'woe_processing/transform_data.csv'
-TRANSFORMED_WOE_DATA_PATH = 'woe_processing/transform_data_woe.csv'
-FEATURE_DETAILS_OUTPUT = 'woe_processing/woe_feature_details.csv'
+FEATURE_DETAILS_OUTPUT = 'woe_feature_details.csv'
 
 
 class WoeTransformer():
@@ -41,12 +38,13 @@ class WoeTransformer():
         y : array-like, shape = [n_samples]
             The target values.
         """
-        self._prepare_data(X, y, FIT_DATA_PATH)
+        data = X.copy()
+        data['target'] = y
 
         with open(os.devnull, 'w') as devnull:
             with contextlib.redirect_stdout(devnull):
                 fp.process_train_woe(
-                    FIT_DATA_PATH,
+                    data,
                     FEATURE_DETAILS_OUTPUT,
                     self.save_woe_pickle_filepath,
                     self.config_filepath,
@@ -65,37 +63,26 @@ class WoeTransformer():
             The target values.
         """
         if self.config_filepath is None:
-            raise ValueError("Config filepath does not exist.\
-                Please define a config file first.")
+            raise ValueError("Config filepath does not exist."
+                             " Please define a config file first.")
 
         if self.load_woe_pickle_filepath is None:
-            raise ValueError("Load WOE pickle filepath does not exist.\
-                Either fit model or load model first.")
+            raise ValueError("Load WOE pickle filepath does not exist."
+                             " Either fit model or load model first.")
 
-        self._prepare_data(X, y, TRANSFORM_DATA_PATH)
+        data = X.copy()
+        data['target'] = -1
 
         with open(os.devnull, 'w') as devnull:
             with contextlib.redirect_stdout(devnull):
-                fp.process_woe_trans(
-                    TRANSFORM_DATA_PATH,
+                df_transformed = fp.process_woe_trans(
+                    data,
                     self.load_woe_pickle_filepath,
-                    TRANSFORMED_WOE_DATA_PATH,
                     self.config_filepath)
 
-        df_processed = self._load_data(TRANSFORMED_WOE_DATA_PATH)
-        X_processed = df_processed.drop('target', axis=1)
-        y_processed = df_processed.target.values
-        return X_processed, y_processed
+        X_processed = df_transformed.drop('target', axis=1)
 
-    def _prepare_data(self, X, y, outpath):
-        # Create directory if not exist
-        subprocess.check_output('mkdir -p ./woe_processing', shell=True)
-        data = X.copy()
-        data['target'] = y
-        data.to_csv(outpath, index=False)
-
-    def _load_data(self, filepath):
-        return pd.read_csv(TRANSFORMED_WOE_DATA_PATH)
+        return X_processed
 
     def _read_config_vars(self):
         conf = pd.read_csv(self.config_filepath)

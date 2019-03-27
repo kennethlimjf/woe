@@ -17,8 +17,9 @@ class config:
         self.global_gt = None
         self.min_sample_weight = min_sample_weight
 
-    def load_file(self,config_path,data_path=False):
+    def load_file(self, config_path):
         self.config = pd.read_csv(config_path)
+
         # specify variable dtypes
         self.variable_type = self.config[['var_name', 'var_dtype']]
         self.variable_type = self.variable_type.rename(columns={'var_name': 'v_name', 'var_dtype': 'v_type'})
@@ -32,16 +33,16 @@ class config:
         # specify the list of model input variable
         self.candidate_var_list = self.config[self.config['is_candidate'] == 1]['var_name']
 
-        if data_path:
-            data_path = data_path if isinstance(data_path, str) else None
+    def set_dataset(self, df):
+        self.dataset_train = df.copy()
+        self.dataset_train.columns = [col.split('.')[-1] for col in self.dataset_train.columns]
 
-            # load dataset train
-            self.dataset_train = pd.read_csv(data_path)
-            self.dataset_train.columns = [col.split('.')[-1] for col in self.dataset_train.columns]
+        # specify some other global variables about the training dataset
+        self.dataset_len = len(self.dataset_train)
+        self.min_sample = int(self.dataset_len * self.min_sample_weight)
 
-            # specify some other global variables about the training dataset
-            self.dataset_len = len(self.dataset_train)
-            self.min_sample = int(self.dataset_len * self.min_sample_weight)
+        if (('target' in self.dataset_train.columns) and
+            not self.dataset_train.target.isnull().any()):
             self.global_bt = sum(self.dataset_train['target'])
             self.global_gt = len(self.dataset_train) - sum(self.dataset_train['target'])
 
