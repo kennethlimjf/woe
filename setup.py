@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = 'woe',
-    version = '0.1.7',
+    version = '0.1.8',
     description = (
         'Tools for WoE Transformation mostly used in ScoreCard Model for credit rating'
     ),
@@ -30,11 +30,5 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries'
     ],
-    keywords = ["math","finance","scorecard","woe",'iv'],
-    install_requires = [
-        'pandas>=0.19.2',
-        'numpy>=1.11.3',
-        'scipy>=0.18.1',
-        'matplotlib>=2.0.0',
-    ]
+    keywords = ["math","finance","scorecard","woe",'iv']
 )

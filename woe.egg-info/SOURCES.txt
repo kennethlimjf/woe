@@ -17,5 +17,4 @@ woe/sklearn.py
 woe.egg-info/PKG-INFO
 woe.egg-info/SOURCES.txt
 woe.egg-info/dependency_links.txt
-woe.egg-info/requires.txt
 woe.egg-info/top_level.txt

@@ -4,7 +4,7 @@ woe
 .. image:: https://travis-ci.org/justdoit0823/pywxclient.svg?branch=master
     :target: https://travis-ci.org/justdoit0823/pywxclient
 
-version: 0.1.7
+version: 0.1.8
 
 Tools for WoE Transformation mostly used in ScoreCard Model for credit rating
 
@@ -40,15 +40,15 @@ Features
 **woe** module function tree
 ============================
 
-:: 
+::
 
 	|- __init__
-	|- config.py 
+	|- config.py
 	|   |-- config
 	|   	|-- __init__
 	|		|-- change_config_var_dtype()
 	|		|-- load_file()
-	|- eval.py 
+	|- eval.py
 	|   |-- compute_ks()
 	|   |-- eval_data_summary()
 	|   |-- eval_feature_detail()
@@ -61,7 +61,7 @@ Features
 	|   |-- proc_cor_eval()
 	|   |-- proc_validation()
 	|   |-- wald_test()
-	|- feature_process.py 
+	|- feature_process.py
 	|   |-- binning_data_split()
 	|   |-- calculate_iv_split()
 	|   |-- calulate_iv()
@@ -75,10 +75,10 @@ Features
 	|   |-- process_woe_trans()
 	|   |-- search()
 	|   |-- woe_trans()
-	|- ftrl.py 
+	|- ftrl.py
 	|   |-- FTRL()
 	|   |-- LR()
-	|- GridSearch.py 
+	|- GridSearch.py
 	|   |-- fit_single_lr()
 	|   |-- grid_search_lr_c()
 	|   |-- grid_search_lr_c_main()
@@ -120,7 +120,7 @@ woe 0.1.1 2017-11-28
 	* woe.feature_process.binning_data_split(): reduce the number of len() function calls with __len__() and shape attributes;replace namedtuple with dict
 	* woe.feature_process.fillna(): new added function to fill null value
 	* woe.GridSearch.grid_search_lr_c(): list of regularization parameter c specified inside the function is changed to the user specified
-	
+
 woe 0.0.9 2017-11-21
 
 	* Add module : GridSearch for the search of optimal hyper parametric C in LogisticRegression
@@ -128,9 +128,9 @@ woe 0.0.9 2017-11-21
 
 woe 0.0.8 2017-09-28
 
-	* More flexible: cancel conditional restriction in function feature_process.change_feature_dtype() 
+	* More flexible: cancel conditional restriction in function feature_process.change_feature_dtype()
 	* Fix bug: the wrong use of deepcopy in function feature_process.woe_trans()
-	
+
 woe 0.0.7 2017-09-19
 
 	* Fix bug: eval.eval_feature_detail raises ValueError('arrays must all be same length')

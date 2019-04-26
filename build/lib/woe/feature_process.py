@@ -501,7 +501,7 @@ def process_train_woe(
         outfile_path=None,
         rst_path=None,
         config_path=None,
-        min_sample_weight=0.05):
+        min_sample_weight_config=None):
     ''' Process training data for WOE
 
     Parameters
@@ -518,9 +518,11 @@ def process_train_woe(
     rst : List of InfoValue instances
     '''
     # Load config
-    cfg = config.config(min_sample_weight=min_sample_weight)
+    cfg = config.config()
     cfg.load_file(config_path)
     cfg.set_dataset(dataset)
+    cfg.load_min_sample_weight_config(min_sample_weight_config)
+    print(cfg.min_sample_weight_config)
 
     # Prepare variable list
     bin_var_list = [tmp for tmp in cfg.bin_var_list
@@ -541,7 +543,7 @@ def process_train_woe(
     for var in bin_var_list:
         iv_obj = proc_woe_continuous(
                      cfg.dataset_train, var,
-                     cfg.global_bt, cfg.global_gt, cfg.min_sample,
+                     cfg.global_bt, cfg.global_gt, cfg.get_min_sample(var),
                      alpha=0.05)
         rst.append(iv_obj)
 
@@ -550,7 +552,7 @@ def process_train_woe(
         cfg.dataset_train.loc[cfg.dataset_train[var].isnull(), (var)] = 'missing'
         iv_obj = proc_woe_discrete(
                      cfg.dataset_train, var,
-                     cfg.global_bt, cfg.global_gt, cfg.min_sample,
+                     cfg.global_bt, cfg.global_gt, cfg.get_min_sample(var),
                      alpha=0.05)
         rst.append(iv_obj)
 
@@ -609,4 +611,3 @@ def process_woe_trans(
         cfg.dataset_train[r.var_name] = woe_trans(cfg.dataset_train[r.var_name], r)
 
     return cfg.dataset_train.copy()
-
