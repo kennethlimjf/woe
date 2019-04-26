@@ -17,11 +17,11 @@ class WoeTransformer():
                  config_filepath=None,
                  save_woe_pickle_filepath=None,
                  load_woe_pickle_filepath=None,
-                 min_sample_weight=0.05):
+                 min_sample_weight_config=None):
         self.config_filepath = config_filepath
         self.save_woe_pickle_filepath = save_woe_pickle_filepath
         self.load_woe_pickle_filepath = load_woe_pickle_filepath
-        self.min_sample_weight = min_sample_weight
+        self.min_sample_weight_config = min_sample_weight_config
 
     @property
     def columns(self):
@@ -48,7 +48,7 @@ class WoeTransformer():
                     FEATURE_DETAILS_OUTPUT,
                     self.save_woe_pickle_filepath,
                     self.config_filepath,
-                    self.min_sample_weight)
+                    self.min_sample_weight_config)
 
         self.load_woe_pickle_filepath = self.save_woe_pickle_filepath
 
@@ -73,12 +73,12 @@ class WoeTransformer():
         data = X.copy()
         data['target'] = -1
 
-        with open(os.devnull, 'w') as devnull:
-            with contextlib.redirect_stdout(devnull):
-                df_transformed = fp.process_woe_trans(
-                    data,
-                    self.load_woe_pickle_filepath,
-                    self.config_filepath)
+        # with open(os.devnull, 'w') as devnull:
+        #     with contextlib.redirect_stdout(devnull):
+        df_transformed = fp.process_woe_trans(
+            data,
+            self.load_woe_pickle_filepath,
+            self.config_filepath)
 
         X_processed = df_transformed.drop('target', axis=1)
 

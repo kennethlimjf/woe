@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 __author__ = 'boredbird'
 import pandas as pd
+import yaml
 
 class config:
 
-    def __init__(self, min_sample_weight=0.05):
+    def __init__(self):
         self.config = None
         self.dataset_train = None
         self.variable_type = None
@@ -15,7 +16,6 @@ class config:
         self.min_sample = None
         self.global_bt = None
         self.global_gt = None
-        self.min_sample_weight = min_sample_weight
 
     def load_file(self, config_path):
         self.config = pd.read_csv(config_path)
@@ -33,13 +33,28 @@ class config:
         # specify the list of model input variable
         self.candidate_var_list = self.config[self.config['is_candidate'] == 1]['var_name']
 
+    def load_min_sample_weight_config(self, config_path):
+        with open(config_path, 'r') as f:
+            self.min_sample_weight_config = yaml.load(f)['features']
+
+    def get_min_sample(self, var):
+        min_sample_weight = None
+        for feature in self.min_sample_weight_config:
+            if feature.get('feature_name') == var:
+                min_sample_weight = feature.get('min_sample_weight')
+
+        if min_sample_weight:
+            return int(self.dataset_len * min_sample_weight)
+        else:
+            raise ValueError('Feature not found')
+
     def set_dataset(self, df):
         self.dataset_train = df.copy()
         self.dataset_train.columns = [col.split('.')[-1] for col in self.dataset_train.columns]
 
         # specify some other global variables about the training dataset
         self.dataset_len = len(self.dataset_train)
-        self.min_sample = int(self.dataset_len * self.min_sample_weight)
+        # self.min_sample = int(self.dataset_len * self.min_sample_weight)
 
         if (('target' in self.dataset_train.columns) and
             not self.dataset_train.target.isnull().any()):
